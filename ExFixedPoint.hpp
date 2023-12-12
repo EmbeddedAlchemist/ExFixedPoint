@@ -1,7 +1,21 @@
-#include <cstdint>
-#include "Fixed32.hpp"
-#include "FixedSym.hpp"
+#pragma once
 
-namespace ExFixedPoint{
-using FixedSym16 = FixedSym<std::int16_t, std::uint16_t, std::int32_t>;
-}
+#include <cstdint>
+#include "Fixed.hpp"
+
+namespace ExFixedPoint {
+
+template <std::size_t fracBits>
+using Fixed8 = Fixed<std::int8_t, fracBits>;
+
+template <std::size_t fracBits>
+using Fixed16 = Fixed<std::int16_t, fracBits>;
+
+template <std::size_t fracBits>
+using Fixed32 = Fixed<std::int32_t, fracBits>;
+
+template <std::size_t fracBits>
+using Fixed64 = Fixed<std::int64_t, fracBits>;
+
+
+} // namespace ExFixedPoint
