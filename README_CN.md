@@ -1,58 +1,68 @@
 # ExFixedPoint
-[中文版本](./README_CN.md)
+[English Edition](./README.md)
 
-ExFixedPoint is a C++ Fixed Point Arithmetic Library. Supported C++11 or higher.
-
-
-
-## To Do
-
-- [x] Four Operations
-- [ ] More math function in `math.h`
+ExFixedPoint 是一个 C++ 定点计算库，支持C++11或更高的版本。
 
 
 
-## Benchmark
+## 计划清单
 
-It can be seen that the arithmetic overhead of fixed-point numbers is similar to that of integers
+- [x] 四则运算
+- [ ] `math.h`中的数学函数
+
+
+
+## 性能测试
+
+定点数的运算开销与整数相近
 
 STM32F103, 72 MHz, AC6, -Ofast, C++11
 
-| Operate (100,000 times) \\ type |   double   |   float    | FastFixed32 | Fixed16  |   Fixed32    | int32_t  |
-| :-----------------------------: | :--------: | :--------: | :---------: | :------: | :----------: | :------: |
-|       type = type + type;       | 1534.96 ms | 1190.26 ms |  10.62 ms   | 10.63 ms |   10.62 ms   | 10.62 ms |
-|       type = type - type;       | 1536.18 ms | 1270.24 ms |  10.89 ms   | 10.75 ms |   10.76 ms   | 10.62 ms |
-|      type = type \* type;       | 1352.03 ms | 1202.88 ms |  22.01 ms   | 29.03 ms | 72.55 ms \*  | 10.76 ms |
-|       type = type / type;       | 1191.88 ms | 1136.28 ms |  36.77 ms   | 53.53 ms | 455.30 ms \* | 20.76 ms |
+| 100,000次运算 \\ 类型 |   double   |   float    | FastFixed32 | Fixed16  |   Fixed32    | int32_t  |
+| :-------------------: | :--------: | :--------: | :---------: | :------: | :----------: | :------: |
+|  type = type + type;  | 1534.96 ms | 1190.26 ms |  10.62 ms   | 10.63 ms |   10.62 ms   | 10.62 ms |
+|  type = type - type;  | 1536.18 ms | 1270.24 ms |  10.89 ms   | 10.75 ms |   10.76 ms   | 10.62 ms |
+| type = type \* type;  | 1352.03 ms | 1202.88 ms |  22.01 ms   | 29.03 ms | 72.55 ms \*  | 10.76 ms |
+|  type = type / type;  | 1191.88 ms | 1136.28 ms |  36.77 ms   | 53.53 ms | 455.30 ms \* | 20.76 ms |
 
-\* Fixed32 types allow type elevation during multiplication and division operations, which reduces the loss of precision due to the operation, but can lead to performance degradation, especially if the machine does not support 64-bit integer operations.
+\* Fixed32 允许在乘除运算时的类型提升， 可以避免损失精度，但会增大性能开销，特别是在不支持64位运算的机器上。
 
-## Quick Start!
+## 原神，启动！
 
-### Setup
+### 使用前说明
 
-1. To use ExFixedPoint, you may add the directory containing` ExFixedPoint.hpp` to the Include Path.
-2. Then, include `ExFixedPoint.hpp` in your source file. ExFixedPoint is fully implemented by the template, no source file need to add.
-3. Fixed-point class `Fixed` are contained in namespace `ExFixedPoint`
-4. You can also use the preset types provided in `ExFixedPoint.hpp`.
+1. 将包含` ExFixedPoint.hpp` 的目录添加到 Include Path 中
+2. 在源文件中引入 `ExFixedPoint.hpp` 。 ExFixedPoint 完全由模板实现，不需要添加源文件。
+3. 定点数类 `Fixed` 包含在命名空间 `ExFixedPoint`中。
+4. 你也可以直接使用 `ExFixedPoint.hpp`提供的预设类型.
 
-### Construct a Fixed-Point
+### 构造定点数
 
-Class `Fixed` has 3 template parameters:
+类 `Fixed` 有3个模板参数:
 
-- ` typename BaseType` Specify an integer type for storing the entire fixed-point number, fixed-point number will share same sign as the integer type
-  - Must be a integer type
-- `unsigned int fracBits` Specifies the number of fractional digits of the fixed point. 
-  - This value must be greater than 0 and less than the number of digits of the `BaseType`
-  - integers and fractions must be preserved to at least one place.  
-- `bool allowTypeElevation` This value controls whether or not the result is allowed to be lifted to a larger integer type during multiplication and division operations, which can improve the precision of the operation, but can degrade performance.
-  - Default is true
+- ` typename BaseType` 指定一个整数类型用于存储定点数。定点数的符号性和这个整数类型相同。
+  - 必须是一个整数类型。
+- `unsigned int fracBits` 指定定点数中小数所占的位数. 
+  - 必须大于0，小于 `BaseType`的位数
+  - 整数和小数部分均至少占一位.  
+- `bool allowTypeElevation` 该值控制是否允许在乘除运算的时候进行类型提升。可以提升精度，但会降低性能。
+  - 默认为 true
 
-An error in this value will cause the static_assert in the class to fail.
+若上述参数有误，类中的static_assert会大声哭闹来提示你的。
 
-### Use Preset Type
+可以直接从原生数字类型构造定点数，或显示调用构造方法或From方法来构造。
 
-For ease of use, ExFixedPoint offers a number of preset types
+~~~cpp
+Fixed<std::int32_t, 16. true> a = 3.14; //从原生数字类型隐式构造
+Fixed<std::int32_t, 16. true> b(3.14); //显式构造
+auto b = Fixed<std::int32_t, 16. true>::from(3.14); //from方法
+~~~
+
+
+
+### 预设类型
+
+为方便使用， ExFixedPoint 提供了一些预设类型
 
 |        Type         |   `BaseType`    | `fracBits` | `allowTypeElevation` |
 | :-----------------: | :-------------: | :--------: | :------------------: |
@@ -105,15 +115,15 @@ For ease of use, ExFixedPoint offers a number of preset types
 | `FastFixed_48_16u`  | `std::uint64_t` |     16     |        false         |
 |  `FastFixed_56_8u`  | `std::uint64_t` |     8      |        false         |
 
-`-` : Need to specify in template parameter.
+`-` : 需要手动在模板参数中指定。
 
-`*` : Only available in machine that support `__int128_t`and`__uint128_t`
+`*` : 仅在支持 `__int128_t`、`__uint128_t`的机器上生效。
 
-### Mathematical Operation
+### 数学运算
 
-ExFixedPoint allow mathematical operation just like native arithmetic type, you can use operator `+` `-` `*` `/` `+=` `-=` `*=` `/=` between same type fixed-point, different type fixed-point or  native arithmetic type.
+ExFixedPoint 可以像操作原生数字类型一样操作定点数, 可以在相同或不同类型的定点数和原生数字类型之间使用 `+` `-` `*` `/` `+=` `-=` `*=` `/=` 运算符.
 
-Example:
+允许隐式从原生数字类型转为定点数，但不允许隐式从定点数转为原生数字类型。 你可以使用`as`方法或显式类型转换来转换为原生类型。
 
 ~~~Cpp
 Fixed_8_8 pi = 3.14159;                 //Construct from floating-point
