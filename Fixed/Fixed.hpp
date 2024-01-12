@@ -195,7 +195,7 @@ class Fixed {
     inline constexpr bool operator<=(const Fixed &other) const noexcept { return this->value <= other.value; }
     inline constexpr bool operator>=(const Fixed &other) const noexcept { return this->value >= other.value; }
 
-    inline constexpr Fixed &operator=(const Fixed &other) noexcept {
+    inline Fixed &operator=(const Fixed &other) noexcept {
         EX_PFM_OUT("Copy Assignment Operator\n");
         this->value = other.value;
         return *this;
